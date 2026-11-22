@@ -47,7 +47,7 @@ button.active,button.primary{background:#1764d2;color:white;border-color:#1764d2
 </div>
 
 <div class="controls">
-<select id="passageSelect">
+<select id="passageSelect"></select>
 <option value="0">English Junior Passage 1</option>
 <option value="1">English Junior Passage 2</option>
 <option value="2">English Junior Passage 3</option>
@@ -78,7 +78,17 @@ button.active,button.primary{background:#1764d2;color:white;border-color:#1764d2
 const passages=[
 "Scientific evidence indicates that regular physical activity, exercise, and fitness are a key determinant of health. Appropriate doses of regular physical activity, participation in sports provides male and female of all ages, including those with disability, with physical and mental health benefits, as well as with social relationships. Physical activity is a cheap and strong means for prevention of diseases, improvement health and well-being, and it also promotes integration and social interaction. This report provides the public health recommended levels of physical activity, the prevalence and costs of physical inactivity, and the health benefits of regular activity.\n\nPhysical activity refers to all energy expended by movement, and is important for a healthy life.",
 "Education is one of the most important parts of our life. It helps us gain knowledge, develop skills and become responsible citizens. Students should develop good habits, read books and respect their teachers. Learning gives us confidence and helps us achieve our goals.",
-"Trees are very important for our environment. They provide oxygen, shade, fruits and shelter for birds and animals. We should plant more trees and protect forests. A clean and green environment makes our planet a better place to live."
+"Trees are very important for our environment. They provide oxygen, shade, fruits and shelter for birds and animals. We should plant more trees and protect forests. A clean and green environment makes our planet a better place to live. 
+"Morning exercise is a healthy habit. It keeps our body active and our mind fresh. Walking, running and playing outdoor games are good activities.",
+
+"Books are our best friends. They teach us many useful things and improve our imagination. Reading every day helps us learn new words.",
+
+"Discipline is important in student life. Students should respect their teachers, complete their homework and follow good habits.",
+
+"India is a beautiful country with different languages, cultures and traditions. People celebrate many festivals and live together with unity.",
+
+"Water is essential for all living things. We should save water, avoid wastage and keep rivers and lakes clean."
+"
 ];
 
 let start=null, timer=null;
@@ -157,6 +167,14 @@ document.getElementById("result").textContent=
 }
 
 document.getElementById("passageSelect").addEventListener("change",loadPassage);
+  const select = document.getElementById("passageSelect");
+
+passages.forEach((item, index) => {
+  const option = document.createElement("option");
+  option.value = index;
+  option.textContent = "English Practice " + (index + 1);
+  select.appendChild(option);
+});
 loadPassage();
 </script>
 </body>
