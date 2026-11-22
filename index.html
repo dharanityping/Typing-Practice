@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Typing Practice</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#f5f7fb;color:#17233d}
+header{background:#164b9b;color:white;padding:20px;text-align:center}
+header h2{margin:0}
+main{max-width:1250px;margin:25px auto;padding:10px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:white;padding:18px;text-align:center;border-radius:10px;border:1px solid #ddd}
+.stat b{display:block;font-size:25px;color:#1764d2;margin-top:8px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.panel{background:white;padding:18px;border:1px solid #ddd;border-radius:12px}
+.panel h3{margin-top:0}
+.passage{height:320px;overflow:auto;background:#fafafa;padding:16px;line-height:1.9;font-size:16px;white-space:pre-wrap}
+textarea{width:100%;height:320px;padding:16px;font-size:16px;line-height:1.8;border:2px solid #3982ff;border-radius:10px;resize:vertical}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px}
+button,select{padding:10px 15px;border:1px solid #bbb;border-radius:7px;background:white;cursor:pointer}
+button.active,button.primary{background:#1764d2;color:white;border-color:#1764d2}
+.buttons{margin-top:15px;display:flex;gap:10px;flex-wrap:wrap}
+#result{margin-top:15px;color:#1764d2;font-weight:bold}
+@media(max-width:700px){
+.layout{grid-template-columns:1fr}
+.stats{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<header>
+<h2>English Typing Practice</h2>
+<p>Improve Your Typing Speed & Accuracy</p>
+</header>
+
+<main>
+
+<div class="stats">
+<div class="stat">Speed (WPM)<b id="wpm">0</b></div>
+<div class="stat">Accuracy<b id="accuracy">100%</b></div>
+<div class="stat">Time<b id="time">00:00</b></div>
+<div class="stat">Mistakes<b id="mistakes">0</b></div>
+</div>
+
+<div class="controls">
+<select id="passageSelect">
+<option value="0">English Junior Passage 1</option>
+<option value="1">English Junior Passage 2</option>
+<option value="2">English Junior Passage 3</option>
+</select>
+<button onclick="setColumns(1)" id="one" class="active">1 Column</button>
+<button onclick="setColumns(2)" id="two">2 Columns</button>
+</div>
+
+<div class="layout" id="layout">
+<section class="panel">
+<h3>Passage: <span id="passageName">English Junior Passage 1</span></h3>
+<div class="passage" id="passage"></div>
+</section>
+
+<section class="panel">
+<h3>Your Response</h3>
+<textarea id="typing" placeholder="Start typing here..." spellcheck="false"></textarea>
+<div class="buttons">
+<button class="primary" onclick="resetTest()">Restart</button>
+<button onclick="showResult()">View Result</button>
+</div>
+<div id="result"></div>
+</section>
+</div>
+</main>
+
+<script>
+const passages=[
+"Scientific evidence indicates that regular physical activity, exercise, and fitness are a key determinant of health. Appropriate doses of regular physical activity, participation in sports provides male and female of all ages, including those with disability, with physical and mental health benefits, as well as with social relationships. Physical activity is a cheap and strong means for prevention of diseases, improvement health and well-being, and it also promotes integration and social interaction. This report provides the public health recommended levels of physical activity, the prevalence and costs of physical inactivity, and the health benefits of regular activity.\n\nPhysical activity refers to all energy expended by movement, and is important for a healthy life.",
+"Education is one of the most important parts of our life. It helps us gain knowledge, develop skills and become responsible citizens. Students should develop good habits, read books and respect their teachers. Learning gives us confidence and helps us achieve our goals.",
+"Trees are very important for our environment. They provide oxygen, shade, fruits and shelter for birds and animals. We should plant more trees and protect forests. A clean and green environment makes our planet a better place to live."
+];
+
+let start=null, timer=null;
+
+const typing=document.getElementById("typing");
+const passage=document.getElementById("passage");
+
+function loadPassage(){
+let n=Number(document.getElementById("passageSelect").value);
+document.getElementById("passageName").textContent=
+"English Junior Passage "+(n+1);
+passage.textContent=passages[n];
+resetTest();
+}
+
+function resetTest(){
+typing.value="";
+start=null;
+clearInterval(timer);
+timer=null;
+document.getElementById("wpm").textContent="0";
+document.getElementById("accuracy").textContent="100%";
+document.getElementById("time").textContent="00:00";
+document.getElementById("mistakes").textContent="0";
+document.getElementById("result").textContent="";
+}
+
+function update(){
+let typed=typing.value;
+let target=passages[Number(document.getElementById("passageSelect").value)];
+let correct=0, mistakes=0;
+
+for(let i=0;i<typed.length;i++){
+if(typed[i]===target[i]) correct++;
+else mistakes++;
+}
+
+let seconds=start?Math.floor((Date.now()-start)/1000):0;
+let minutes=seconds/60;
+let wpm=minutes>0?Math.round((correct/5)/minutes):0;
+let accuracy=typed.length?Math.round(correct/typed.length*100):100;
+
+document.getElementById("wpm").textContent=wpm;
+document.getElementById("accuracy").textContent=accuracy+"%";
+document.getElementById("mistakes").textContent=mistakes;
+document.getElementById("time").textContent=
+String(Math.floor(seconds/60)).padStart(2,"0")+":"+
+String(seconds%60).padStart(2,"0");
+
+if(typed===target){
+clearInterval(timer);
+document.getElementById("result").textContent="Excellent! Passage completed!";
+}
+}
+
+typing.addEventListener("input",()=>{
+if(!start){
+start=Date.now();
+timer=setInterval(update,1000);
+}
+update();
+});
+
+function setColumns(n){
+document.getElementById("layout").style.gridTemplateColumns=
+n===1?"1fr":"1fr 1fr";
+document.getElementById("one").classList.toggle("active",n===1);
+document.getElementById("two").classList.toggle("active",n===2);
+}
+
+function showResult(){
+update();
+document.getElementById("result").textContent=
+"Your Speed: "+document.getElementById("wpm").textContent+
+" WPM | Accuracy: "+document.getElementById("accuracy").textContent;
+}
+
+document.getElementById("passageSelect").addEventListener("change",loadPassage);
+loadPassage();
+</script>
+</body>
+</html>
