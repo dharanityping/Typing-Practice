@@ -15,7 +15,7 @@ main{max-width:1250px;margin:25px auto;padding:10px}
 .stat{background:white;padding:18px;text-align:center;border-radius:10px;border:1px solid #ddd}
 .stat b{display:block;font-size:25px;color:#1764d2;margin-top:8px}
 .layout{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.panel{background:white;padding:18px;border:1px solid #ddd;border-radius:12px}
+.panel{background:white;padding:18px;border:1px solid #ddd;border-radius:12px;min-width:0}
 .panel h3{margin-top:0}
 .passage{height:320px;overflow:auto;background:#fafafa;padding:16px;line-height:1.9;font-size:16px;white-space:pre-wrap}
 textarea{width:100%;height:320px;padding:16px;font-size:16px;line-height:1.8;border:2px solid #3982ff;border-radius:10px;resize:vertical}
@@ -48,17 +48,13 @@ button.active,button.primary{background:#1764d2;color:white;border-color:#1764d2
 
 <div class="controls">
 <select id="passageSelect"></select>
-<option value="0">English Junior Passage 1</option>
-<option value="1">English Junior Passage 2</option>
-<option value="2">English Junior Passage 3</option>
-</select>
 <button onclick="setColumns(1)" id="one" class="active">1 Column</button>
 <button onclick="setColumns(2)" id="two">2 Columns</button>
 </div>
 
 <div class="layout" id="layout">
 <section class="panel">
-<h3>Passage: <span id="passageName">English Junior Passage 1</span></h3>
+<h3>Passage: <span id="passageName"></span></h3>
 <div class="passage" id="passage"></div>
 </section>
 
@@ -75,107 +71,134 @@ button.active,button.primary{background:#1764d2;color:white;border-color:#1764d2
 </main>
 
 <script>
-const passages=[
-"Scientific evidence indicates that regular physical activity, exercise, and fitness are a key determinant of health. Appropriate doses of regular physical activity, participation in sports provides male and female of all ages, including those with disability, with physical and mental health benefits, as well as with social relationships. Physical activity is a cheap and strong means for prevention of diseases, improvement health and well-being, and it also promotes integration and social interaction. This report provides the public health recommended levels of physical activity, the prevalence and costs of physical inactivity, and the health benefits of regular activity.\n\nPhysical activity refers to all energy expended by movement, and is important for a healthy life.",
+
+const passages = [
+
+"Scientific evidence indicates that regular physical activity, exercise, and fitness are a key determinant of health. Appropriate doses of regular physical activity provide male and female of all ages with physical and mental health benefits. Physical activity is a cheap and strong means for prevention of diseases and improvement of health and well-being.",
+
 "Education is one of the most important parts of our life. It helps us gain knowledge, develop skills and become responsible citizens. Students should develop good habits, read books and respect their teachers. Learning gives us confidence and helps us achieve our goals.",
-"Trees are very important for our environment. They provide oxygen, shade, fruits and shelter for birds and animals. We should plant more trees and protect forests. A clean and green environment makes our planet a better place to live. 
-"Morning exercise is a healthy habit. It keeps our body active and our mind fresh. Walking, running and playing outdoor games are good activities.",
 
-"Books are our best friends. They teach us many useful things and improve our imagination. Reading every day helps us learn new words.",
+"Trees are very important for our environment. They provide oxygen, shade, fruits and shelter for birds and animals. We should plant more trees and protect forests. A clean and green environment makes our planet a better place to live.",
 
-"Discipline is important in student life. Students should respect their teachers, complete their homework and follow good habits.",
+"Morning exercise is a healthy habit. It keeps our body active and our mind fresh. Walking, running and playing outdoor games are good activities. Regular exercise helps us stay healthy and energetic.",
 
-"India is a beautiful country with different languages, cultures and traditions. People celebrate many festivals and live together with unity.",
+"Books are our best friends. They teach us many useful things and improve our imagination. Reading every day helps us learn new words. Books also improve our knowledge and communication skills.",
 
-"Water is essential for all living things. We should save water, avoid wastage and keep rivers and lakes clean."
-"
+"Discipline is important in student life. Students should respect their teachers, complete their homework and follow good habits. Discipline helps everyone become responsible and successful.",
+
+"India is a beautiful country with different languages, cultures and traditions. People celebrate many festivals and live together with unity. India is famous for its history, monuments and natural beauty.",
+
+"Water is essential for all living things. We should save water, avoid wastage and keep rivers and lakes clean. Every person has a responsibility to protect water resources for the future.",
+
+"Time is very valuable in our life. We should use every minute wisely. Successful people plan their daily activities and complete their work on time. Good time management helps us achieve our goals.",
+
+"Technology has changed our world. Computers and the internet help people communicate, learn and share information. Students can use technology to improve their knowledge and develop new skills.",
+
+"Nature gives us beautiful rivers, mountains, forests and flowers. Every living creature plays an important role in the environment. We must protect nature and keep our surroundings clean.",
+
+"Teamwork is an important skill. When people work together, they can share ideas and solve problems. Helping others and respecting different opinions make a team successful."
+
 ];
 
-let start=null, timer=null;
+let start = null;
+let timer = null;
 
-const typing=document.getElementById("typing");
-const passage=document.getElementById("passage");
+const typing = document.getElementById("typing");
+const passage = document.getElementById("passage");
+const select = document.getElementById("passageSelect");
+
+// Automatically create passage dropdown
+
+passages.forEach((item,index)=>{
+const option = document.createElement("option");
+option.value = index;
+option.textContent = "English Practice " + (index+1);
+select.appendChild(option);
+});
 
 function loadPassage(){
-let n=Number(document.getElementById("passageSelect").value);
-document.getElementById("passageName").textContent=
-"English Junior Passage "+(n+1);
-passage.textContent=passages[n];
+let n = Number(select.value);
+document.getElementById("passageName").textContent =
+"English Practice " + (n+1);
+passage.textContent = passages[n];
 resetTest();
 }
 
 function resetTest(){
-typing.value="";
-start=null;
+typing.value = "";
+start = null;
 clearInterval(timer);
-timer=null;
-document.getElementById("wpm").textContent="0";
-document.getElementById("accuracy").textContent="100%";
-document.getElementById("time").textContent="00:00";
-document.getElementById("mistakes").textContent="0";
-document.getElementById("result").textContent="";
+timer = null;
+
+document.getElementById("wpm").textContent = "0";
+document.getElementById("accuracy").textContent = "100%";
+document.getElementById("time").textContent = "00:00";
+document.getElementById("mistakes").textContent = "0";
+document.getElementById("result").textContent = "";
 }
 
 function update(){
-let typed=typing.value;
-let target=passages[Number(document.getElementById("passageSelect").value)];
-let correct=0, mistakes=0;
+let typed = typing.value;
+let target = passages[Number(select.value)];
+
+let correct = 0;
+let mistakes = 0;
 
 for(let i=0;i<typed.length;i++){
-if(typed[i]===target[i]) correct++;
-else mistakes++;
+if(i < target.length && typed[i] === target[i]){
+correct++;
+}else{
+mistakes++;
+}
 }
 
-let seconds=start?Math.floor((Date.now()-start)/1000):0;
-let minutes=seconds/60;
-let wpm=minutes>0?Math.round((correct/5)/minutes):0;
-let accuracy=typed.length?Math.round(correct/typed.length*100):100;
+let seconds = start ? Math.floor((Date.now()-start)/1000) : 0;
+let minutes = seconds/60;
+let wpm = minutes>0 ? Math.round((correct/5)/minutes) : 0;
+let accuracy = typed.length ? Math.round(correct/typed.length*100) : 100;
 
-document.getElementById("wpm").textContent=wpm;
-document.getElementById("accuracy").textContent=accuracy+"%";
-document.getElementById("mistakes").textContent=mistakes;
-document.getElementById("time").textContent=
+document.getElementById("wpm").textContent = wpm;
+document.getElementById("accuracy").textContent = accuracy+"%";
+document.getElementById("mistakes").textContent = mistakes;
+
+document.getElementById("time").textContent =
 String(Math.floor(seconds/60)).padStart(2,"0")+":"+
 String(seconds%60).padStart(2,"0");
 
-if(typed===target){
+if(typed === target){
 clearInterval(timer);
-document.getElementById("result").textContent="Excellent! Passage completed!";
+document.getElementById("result").textContent =
+"Excellent! Passage completed!";
 }
 }
 
 typing.addEventListener("input",()=>{
 if(!start){
-start=Date.now();
-timer=setInterval(update,1000);
+start = Date.now();
+timer = setInterval(update,1000);
 }
 update();
 });
 
 function setColumns(n){
-document.getElementById("layout").style.gridTemplateColumns=
-n===1?"1fr":"1fr 1fr";
+document.getElementById("layout").style.gridTemplateColumns =
+n===1 ? "1fr" : "1fr 1fr";
+
 document.getElementById("one").classList.toggle("active",n===1);
 document.getElementById("two").classList.toggle("active",n===2);
 }
 
 function showResult(){
 update();
-document.getElementById("result").textContent=
+document.getElementById("result").textContent =
 "Your Speed: "+document.getElementById("wpm").textContent+
 " WPM | Accuracy: "+document.getElementById("accuracy").textContent;
 }
 
-document.getElementById("passageSelect").addEventListener("change",loadPassage);
-  const select = document.getElementById("passageSelect");
+select.addEventListener("change",loadPassage);
 
-passages.forEach((item, index) => {
-  const option = document.createElement("option");
-  option.value = index;
-  option.textContent = "English Practice " + (index + 1);
-  select.appendChild(option);
-});
 loadPassage();
+
 </script>
 </body>
 </html>
